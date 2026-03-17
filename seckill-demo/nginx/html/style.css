@@ -1,0 +1,46 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.container {
+    width: 1200px;
+    margin: 50px auto;
+    font-family: "Microsoft YaHei";
+}
+
+h1 {
+    text-align: center;
+    color: #e64340;
+    margin-bottom: 30px;
+}
+
+.product-list {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 50px;
+}
+
+.product-item {
+    width: 300px;
+    padding: 20px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.product-item:hover {
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    transform: translateY(-5px);
+}
+
+.detail-box {
+    width: 100%;
+    padding: 20px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    margin-top: 20px;
+}
