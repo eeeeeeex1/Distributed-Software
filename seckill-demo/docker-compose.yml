@@ -4,13 +4,14 @@ services:
     image: docker.m.daocloud.io/library/mysql:8.0
     container_name: seckill-mysql
     environment:
-      MYSQL_ROOT_PASSWORD: 123456
-      MYSQL_DATABASE: seckill_db
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: seckill
       MYSQL_INITDB_SKIP_TZINFO: 1
     ports:
-      - "3307:3306"
+      - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: always
     networks:
       - seckill-network
@@ -43,13 +44,14 @@ services:
     build: .
     container_name: seckill-service
     ports:
-      - "8082:8082"
+      - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/seckill_db?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/seckill?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: 123456
+      SPRING_DATASOURCE_PASSWORD: root123
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
+      SERVER_PORT: 8080
     depends_on:
       mysql:
         condition: service_healthy
@@ -58,6 +60,21 @@ services:
     restart: always
     networks:
       - seckill-network
+
+  # Nginx 前端
+  nginx:
+    image: docker.m.daocloud.io/library/nginx:alpine
+    container_name: seckill-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/html:/usr/share/nginx/html
+    restart: always
+    networks:
+      - seckill-network
+    depends_on:
+      - seckill-service
 
 volumes:
   mysql-data:

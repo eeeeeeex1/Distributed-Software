@@ -13,6 +13,6 @@ public interface ProductMapper {
     /**
      * 根据ID查询商品
      */
-    @Select("SELECT id, name, price, stock, `desc`, create_time, update_time FROM product WHERE id = #{id}")
+    @Select("SELECT id, name, title, price, stock_count as stock, img_url, status FROM t_product WHERE id = #{id}")
     Product selectById(Long id);
 }

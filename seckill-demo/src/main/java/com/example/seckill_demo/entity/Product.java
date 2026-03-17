@@ -2,6 +2,7 @@ package com.example.seckill_demo.entity;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -9,7 +10,7 @@ import java.util.Date;
  * 商品实体类（适配秒杀场景）
  */
 @Data
-public class Product {
+public class Product implements Serializable {
     private Long id;             // 商品ID
     private String name;         // 商品名称
     private BigDecimal price;    // 商品价格
