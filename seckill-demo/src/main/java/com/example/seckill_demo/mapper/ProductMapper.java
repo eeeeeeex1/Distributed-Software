@@ -15,4 +15,10 @@ public interface ProductMapper {
      */
     @Select("SELECT id, name, price, stock, `desc`, create_time, update_time FROM product WHERE id = #{id}")
     Product selectById(Long id);
+
+    /**
+     * 查询所有商品
+     */
+    @Select("SELECT id, name, price, stock, `desc`, create_time, update_time FROM product")
+    java.util.List<Product> selectList();
 }

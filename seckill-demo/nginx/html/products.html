@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品列表 - 秒杀商城</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <h1>秒杀商城</h1>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">首页</a>
+            <a href="products.html" class="active">商品列表</a>
+            <a href="search.html">搜索商品</a>
+        </div>
+        <div class="nav-auth">
+            <span id="user-info" style="display: none;">
+                欢迎，<span id="username"></span>
+                <button onclick="logout()">退出</button>
+            </span>
+            <span id="auth-buttons">
+                <a href="login.html" class="btn btn-primary">登录</a>
+                <a href="register.html" class="btn btn-secondary">注册</a>
+            </span>
+        </div>
+    </nav>
+
+    <!-- 商品列表 -->
+    <main class="main-container">
+        <section class="section">
+            <h2 class="section-title">全部商品</h2>
+            <div class="product-grid" id="product-list">
+                <!-- 商品将通过JS动态加载 -->
+            </div>
+            <div class="loading" id="loading">加载中...</div>
+            <div class="pagination" id="pagination">
+                <!-- 分页将通过JS动态生成 -->
+            </div>
+        </section>
+    </main>
+
+    <!-- 商品详情弹窗 -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="product-detail">
+                <!-- 商品详情将通过JS动态加载 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <p>&copy; 2026 高并发秒杀系统. All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // 页面加载时检查登录状态并加载商品
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+            loadProducts();
+        });
+    </script>
+</body>
+</html>

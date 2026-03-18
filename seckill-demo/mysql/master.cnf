@@ -1,0 +1,23 @@
+[mysqld]
+# 服务器ID，主库必须唯一
+server-id = 1
+# 开启二进制日志
+log-bin = mysql-bin
+# 二进制日志格式
+binlog-format = ROW
+# 同步的数据库
+binlog-do-db = seckill
+# 忽略的数据库
+binlog-ignore-db = mysql
+binlog-ignore-db = information_schema
+binlog-ignore-db = performance_schema
+binlog-ignore-db = sys
+# 自动清理二进制日志的天数
+expire-logs-days = 7
+# 最大连接数
+max_connections = 1000
+# 字符集
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+# 时区
+default-time-zone = '+8:00'

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>高并发秒杀系统</title>
+    <title>搜索商品 - 秒杀商城</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,9 +13,9 @@
             <h1>秒杀商城</h1>
         </div>
         <div class="nav-links">
-            <a href="index.html" class="active">首页</a>
+            <a href="index.html">首页</a>
             <a href="products.html">商品列表</a>
-            <a href="search.html">搜索商品</a>
+            <a href="search.html" class="active">搜索商品</a>
         </div>
         <div class="nav-auth">
             <span id="user-info" style="display: none;">
@@ -29,41 +29,27 @@
         </div>
     </nav>
 
-    <!-- 主内容区 -->
+    <!-- 搜索区域 -->
     <main class="main-container">
-        <!-- 轮播图区域 -->
-        <section class="hero-section">
-            <div class="hero-content">
-                <h2>限时秒杀 超值优惠</h2>
-                <p>海量商品，限时抢购，先到先得！</p>
-                <a href="products.html" class="btn btn-large">立即抢购</a>
+        <section class="search-section">
+            <h2 class="section-title">商品搜索</h2>
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="请输入商品名称或描述..." 
+                       onkeypress="if(event.key==='Enter') searchProducts()">
+                <button onclick="searchProducts()" class="btn btn-primary">搜索</button>
+                <button onclick="syncToEs()" class="btn btn-secondary">同步数据</button>
             </div>
+            <div id="search-message" class="message"></div>
         </section>
 
-        <!-- 热门商品 -->
+        <!-- 搜索结果 -->
         <section class="section">
-            <h2 class="section-title">热门秒杀商品</h2>
-            <div class="product-grid" id="hot-products">
-                <!-- 商品将通过JS动态加载 -->
+            <div class="product-grid" id="search-results">
+                <!-- 搜索结果将通过JS动态加载 -->
             </div>
-        </section>
-
-        <!-- 系统特性 -->
-        <section class="section features">
-            <h2 class="section-title">系统特性</h2>
-            <div class="feature-grid">
-                <div class="feature-item">
-                    <h3>Redis缓存</h3>
-                    <p>采用分布式缓存，支持高并发访问</p>
-                </div>
-                <div class="feature-item">
-                    <h3>读写分离</h3>
-                    <p>MySQL主从架构，提升数据库性能</p>
-                </div>
-                <div class="feature-item">
-                    <h3>ElasticSearch</h3>
-                    <p>强大的商品搜索功能</p>
-                </div>
+            <div class="loading" id="loading" style="display: none;">搜索中...</div>
+            <div class="pagination" id="pagination">
+                <!-- 分页将通过JS动态生成 -->
             </div>
         </section>
     </main>
@@ -78,7 +64,6 @@
         // 页面加载时检查登录状态
         document.addEventListener('DOMContentLoaded', function() {
             checkLoginStatus();
-            loadHotProducts();
         });
     </script>
 </body>

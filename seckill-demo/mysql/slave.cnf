@@ -1,0 +1,21 @@
+[mysqld]
+# 服务器ID，从库必须唯一
+server-id = 2
+# 开启中继日志
+relay-log = mysql-relay-bin
+# 只读模式
+read-only = 1
+# 同步的数据库
+replicate-do-db = seckill
+# 忽略的数据库
+replicate-ignore-db = mysql
+replicate-ignore-db = information_schema
+replicate-ignore-db = performance_schema
+replicate-ignore-db = sys
+# 最大连接数
+max_connections = 1000
+# 字符集
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+# 时区
+default-time-zone = '+8:00'
