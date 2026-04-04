@@ -31,6 +31,8 @@ public class KafkaConfig {
     public static final String SECKILL_ORDER_TOPIC = "seckill-order";
     // 死信队列主题
     public static final String SECKILL_ORDER_DLT_TOPIC = "seckill-order-dlt";
+    // 支付主题
+    public static final String PAYMENT_TOPIC = "payment-topic";
     // 分区数
     public static final int PARTITIONS = 6;
     // 副本数
@@ -54,6 +56,17 @@ public class KafkaConfig {
     public NewTopic seckillOrderDltTopic() {
         return TopicBuilder.name(SECKILL_ORDER_DLT_TOPIC)
                 .partitions(3)
+                .replicas(REPLICAS)
+                .build();
+    }
+    
+    /**
+     * 创建支付主题
+     */
+    @Bean
+    public NewTopic paymentTopic() {
+        return TopicBuilder.name(PAYMENT_TOPIC)
+                .partitions(PARTITIONS)
                 .replicas(REPLICAS)
                 .build();
     }

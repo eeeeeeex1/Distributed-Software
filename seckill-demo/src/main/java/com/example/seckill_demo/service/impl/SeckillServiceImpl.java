@@ -2,12 +2,14 @@ package com.example.seckill_demo.service.impl;
 
 import com.example.seckill_demo.dto.SeckillMessage;
 import com.example.seckill_demo.dto.SeckillResult;
+import com.example.seckill_demo.dto.TransactionResult;
 import com.example.seckill_demo.entity.Order;
 import com.example.seckill_demo.entity.Product;
 import com.example.seckill_demo.mapper.ProductMapper;
 import com.example.seckill_demo.service.ProductService;
 import com.example.seckill_demo.service.SeckillService;
 import com.example.seckill_demo.service.StockService;
+import com.example.seckill_demo.service.TransactionCoordinatorService;
 import com.example.seckill_demo.util.SnowflakeIdGenerator;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
@@ -58,6 +60,9 @@ public class SeckillServiceImpl implements SeckillService {
     
     @Autowired
     private OrderServiceImpl orderService;
+    
+    @Autowired
+    private TransactionCoordinatorService transactionCoordinatorService;
 
     @Override
     @RateLimiter(name = "seckillRateLimiter", fallbackMethod = "doSeckillRateLimitFallback")
@@ -104,7 +109,7 @@ public class SeckillServiceImpl implements SeckillService {
             // 6. 标记用户已秒杀
             markUserSeckilled(userId, productId);
             
-            // 7. 发送Kafka消息（异步处理订单）
+            // 7. 开始秒杀事务
             SeckillMessage message = new SeckillMessage();
             message.setOrderId(orderId);
             message.setUserId(userId);
@@ -114,6 +119,16 @@ public class SeckillServiceImpl implements SeckillService {
             message.setTimestamp(System.currentTimeMillis());
             message.setTraceId(traceId);
             
+            // 开始事务协调
+            TransactionResult transactionResult = transactionCoordinatorService.beginSeckillTransaction(message);
+            if (!transactionResult.isSuccess()) {
+                logger.error("开始秒杀事务失败：userId={}, productId={}", userId, productId);
+                // 回滚库存
+                stockService.rollbackStock(productId, quantity);
+                return SeckillResult.systemError(transactionResult.getMessage());
+            }
+            
+            // 8. 发送Kafka消息（异步处理订单）
             sendSeckillMessage(message);
             
             // 8. 返回秒杀结果（订单异步处理中）
@@ -188,6 +203,8 @@ public class SeckillServiceImpl implements SeckillService {
                 throw new RuntimeException("数据库库存扣减失败");
             }
             
+            // 提交事务
+            transactionCoordinatorService.commitSeckillTransaction(message.getOrderId().toString());
             logger.info("秒杀订单处理完成：orderId={}", message.getOrderId());
             
         } catch (Exception e) {
@@ -203,9 +220,10 @@ public class SeckillServiceImpl implements SeckillService {
             } else {
                 logger.error("订单处理达到最大重试次数，转入死信队列：orderId={}", message.getOrderId());
                 kafkaTemplate.send("seckill-order-dlt", String.valueOf(message.getUserId()), message);
-                // 回滚Redis库存
+                // 回滚Redis库存和事务
                 stockService.rollbackStock(message.getProductId(), message.getQuantity());
                 removeUserSeckillMark(message.getUserId(), message.getProductId());
+                transactionCoordinatorService.rollbackSeckillTransaction(message.getOrderId().toString());
             }
         } finally {
             MDC.clear();
