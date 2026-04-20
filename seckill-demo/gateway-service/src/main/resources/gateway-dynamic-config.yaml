@@ -1,0 +1,42 @@
+# Nacos配置示例 - 动态配置
+# 将此配置添加到Nacos配置中心的gateway-dynamic-config命名空间中
+
+circuitBreaker:
+  seckillCircuitBreaker:
+    failureRateThreshold: 50
+    waitDurationInOpenState: 10000
+    slidingWindowSize: 10
+  paymentCircuitBreaker:
+    failureRateThreshold: 60
+    waitDurationInOpenState: 15000
+    slidingWindowSize: 8
+  stockCircuitBreaker:
+    failureRateThreshold: 40
+    waitDurationInOpenState: 8000
+    slidingWindowSize: 12
+
+rateLimiter:
+  seckillRateLimiter:
+    limitForPeriod: 100
+    limitRefreshPeriod: 1000
+  paymentRateLimiter:
+    limitForPeriod: 50
+    limitRefreshPeriod: 1000
+  stockRateLimiter:
+    limitForPeriod: 200
+    limitRefreshPeriod: 1000
+
+gateway:
+  routes:
+    seckill-service:
+      uri: lb://seckill-service
+      predicates:
+        - Path=/api/seckill/**
+    payment-service:
+      uri: lb://seckill-service
+      predicates:
+        - Path=/api/payment/**
+    stock-service:
+      uri: lb://seckill-service
+      predicates:
+        - Path=/api/stock/**

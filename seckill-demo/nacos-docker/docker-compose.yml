@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  nacos:
+    image: nacos/nacos-server:v2.2.3
+    container_name: nacos-server
+    environment:
+      - MODE=standalone
+      - SPRING_DATASOURCE_PLATFORM=embedded
+      - PREFER_HOST_MODE=hostname
+      - NACOS_SERVER_PORT=8848
+      - NACOS_AUTH_ENABLE=true
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+      - "9849:9849"
+    volumes:
+      - ./nacos/logs:/home/nacos/logs
+      - ./nacos/data:/home/nacos/data
+    restart: always
+    networks:
+      - seckill-network
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/data:/prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+    restart: always
+    networks:
+      - seckill-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./grafana/data:/var/lib/grafana
+    restart: always
+    networks:
+      - seckill-network
+    depends_on:
+      - prometheus
+
+networks:
+  seckill-network:
+    driver: bridge
